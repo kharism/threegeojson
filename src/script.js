@@ -26,20 +26,25 @@ loader.load("./data/topDummy.json",function(data){
         console.log(dataJson["features"][e])
         var triangleVectors = []
         
-
+        var vertex = []
+        for(var i=1;i<dataJson["features"][e]["geometry"]["coordinates"].length-1;i++){
+            vertex.push(dataJson["features"][e]["geometry"]["coordinates"][0])
+            vertex.push(dataJson["features"][e]["geometry"]["coordinates"][i])
+            vertex.push(dataJson["features"][e]["geometry"]["coordinates"][i+1])
+        }
         // shape.x = e["geometry"]["coordinates"][0][0]
         // shape.y = e["geometry"]["coordinates"][0][1]
         // shape.z = e["geometry"]["coordinates"][0][2]
-        for(var i=0;i<dataJson["features"][e]["geometry"]["coordinates"].length;i++){
+        for(var i=0;i<vertex.length;i++){
             //shape.line(e["geometry"]["coordinates"][i][0],)
             //triangleVectors.push([e["geometry"]["coordinates"][0],])
-            triangleVectors.push(dataJson["features"][e]["geometry"]["coordinates"][i][0])
-            triangleVectors.push(dataJson["features"][e]["geometry"]["coordinates"][i][1])
-            triangleVectors.push(dataJson["features"][e]["geometry"]["coordinates"][i][2])
+            triangleVectors.push(vertex[i][0])
+            triangleVectors.push(vertex[i][1])
+            triangleVectors.push(vertex[i][2])
         }
         const vertices = new Float32Array(triangleVectors)
-        var triangle = new THREE.BufferGeometry()
-        var lineMaterial = new THREE.LineBasicMaterial({color:0xffffff, transparent:true, opacity:0.5});
+        // var triangle = new THREE.BufferGeometry()
+        // var lineMaterial = new THREE.LineBasicMaterial({color:0xffffff, transparent:true, opacity:0.5});
         var triangleMaterial = new THREE.MeshPhongMaterial({color:0xff0000 ,side:THREE.DoubleSide,side: THREE.DoubleSide,flatShading: true});
 
         var geometry = new THREE.BufferGeometry();
