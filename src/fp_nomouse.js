@@ -164,6 +164,7 @@ var FirstPersonControls = function ( object, domElement ) {
 		switch ( event.code ) {
 
 			case 'ArrowUp':
+				this.mouseY=-1;break;
 			case 'KeyW': this.moveForward = true; break;
 
 			case 'ArrowLeft':
@@ -171,6 +172,7 @@ var FirstPersonControls = function ( object, domElement ) {
 			case 'KeyA': this.moveLeft = true; break;
 
 			case 'ArrowDown':
+				this.mouseY=1;break;
 			case 'KeyS': this.moveBackward = true; break;
 
 			case 'ArrowRight':
@@ -188,14 +190,14 @@ var FirstPersonControls = function ( object, domElement ) {
 
 		switch ( event.code ) {
 
-			case 'ArrowUp':
+			case 'ArrowUp':this.mouseY=0;break;
 			case 'KeyW': this.moveForward = false; break;
 
 			case 'ArrowLeft':
                 this.mouseX=0;break
 			case 'KeyA': this.moveLeft = false; break;
 
-			case 'ArrowDown':
+			case 'ArrowDown':this.mouseY=0;break;
 			case 'KeyS': this.moveBackward = false; break;
 
 			case 'ArrowRight':
