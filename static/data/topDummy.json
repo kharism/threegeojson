@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "entities",
+"features": [
+{ "type": "Feature", "properties": { "Layer": "SIT_RTM_230821", "SubClasses": "AcDbEntity:AcDbPolyline", "Linetype": "CONTINUOUS", "EntityHandle": "71" }, "geometry": { "type": "LineString", "coordinates": [ [ 0, 0, 0 ], [ 3,0,0 ], [ 3,5,0 ], [ 1.5,7,0 ],[ 3,5,0 ],[0,0,0] ] } }
+
+]
+}
