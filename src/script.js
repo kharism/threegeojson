@@ -16,8 +16,13 @@ const scene = new THREE.Scene()
 
 const loader = new THREE.FileLoader();
 
+// scaler
+const x_scale = 0.01 // scale to 1/100 of original size
+const y_scale = 0.01
+const z_scale = 0.01
+
 var dataJson = {}
-loader.load("./data/topDummy.json",function(data){
+loader.load("./data/out.json",function(data){
     dataJson = JSON.parse(data)
     console.log(typeof dataJson["features"])
     //console.log(dataJson["features"][0])
@@ -27,11 +32,17 @@ loader.load("./data/topDummy.json",function(data){
         var triangleVectors = []
         
         var vertex = []
-        for(var i=1;i<dataJson["features"][e]["geometry"]["coordinates"].length-1;i++){
+        var linePoints = [new THREE.Vector3(dataJson["features"][e]["geometry"]["coordinates"][0][0]*x_scale,dataJson["features"][e]["geometry"]["coordinates"][0][1]*y_scale,dataJson["features"][e]["geometry"]["coordinates"][0][2]*z_scale)]
+        var lengthPoint = dataJson["features"][e]["geometry"]["coordinates"].length
+        for(var i=1;i<lengthPoint-1;i++){
             vertex.push(dataJson["features"][e]["geometry"]["coordinates"][0])
             vertex.push(dataJson["features"][e]["geometry"]["coordinates"][i])
             vertex.push(dataJson["features"][e]["geometry"]["coordinates"][i+1])
+
+            linePoints.push(new THREE.Vector3(dataJson["features"][e]["geometry"]["coordinates"][i][0]*x_scale,dataJson["features"][e]["geometry"]["coordinates"][i][1]*y_scale,dataJson["features"][e]["geometry"]["coordinates"][i][2]*z_scale))
         }
+        linePoints.push(new THREE.Vector3(dataJson["features"][e]["geometry"]["coordinates"][lengthPoint-1][0]*x_scale,dataJson["features"][e]["geometry"]["coordinates"][lengthPoint-1][1]*y_scale,dataJson["features"][e]["geometry"]["coordinates"][lengthPoint-1][2]*z_scale))
+        console.log(linePoints)
         // shape.x = e["geometry"]["coordinates"][0][0]
         // shape.y = e["geometry"]["coordinates"][0][1]
         // shape.z = e["geometry"]["coordinates"][0][2]
@@ -44,17 +55,22 @@ loader.load("./data/topDummy.json",function(data){
         }
         const vertices = new Float32Array(triangleVectors)
         // var triangle = new THREE.BufferGeometry()
-        // var lineMaterial = new THREE.LineBasicMaterial({color:0xffffff, transparent:true, opacity:0.5});
-        var triangleMaterial = new THREE.MeshPhongMaterial({color:0xff0000 ,side:THREE.DoubleSide,side: THREE.DoubleSide,flatShading: true});
+        var lineMaterial = new THREE.LineBasicMaterial({color: 0xffffff,linewidth: 10});
+        
+        var triangleMaterial = new THREE.MeshStandardMaterial({color:0xff0000 ,side:THREE.DoubleSide,side: THREE.DoubleSide,flatShading: true,wireframe:false});
 
-        var geometry = new THREE.BufferGeometry();
-        geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+        //var geometry = new THREE.BufferGeometry();
+        var lineGeometry = new THREE.BufferGeometry();
+        //geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+        lineGeometry.setFromPoints(linePoints)
         //geometry.vertices.push( triangleVectors[j][0], triangleVectors[j][1], triangleVectors[j][2] );
         //var face = new THREE.Face3(0, 1, 2);
         //geometry.faces.push(face);
         console.log("Add geometry")
-        const mesh2 = new THREE.Mesh( geometry, triangleMaterial );
-        scene.add(mesh2)
+        const line = new THREE.Line( lineGeometry, lineMaterial );
+        //const mesh2 = new THREE.Mesh( geometry, triangleMaterial );
+        //scene.add(mesh2)
+        scene.add(line)
     }
 })
 // Objects
@@ -119,9 +135,11 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.x =  0
-camera.position.y =  0
-camera.position.z =  2
+camera.position.x =  1289*x_scale
+camera.position.y =  1127*y_scale
+camera.position.z =  -150*z_scale
+
+camera.lookAt(1289*x_scale,1127*y_scale,-185*z_scale)
 // console.log(camera.lookAt.x,camera.lookAt.y,camera.lookAt.z)
 // camera.lookAt.x = 0;
 // camera.lookAt.y = 0;
@@ -192,7 +210,7 @@ const renderer = new THREE.WebGLRenderer({
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-
+//renderer.setClearColor( 0x0f0f0f, 1 );
 /**
  * Animate
  */
