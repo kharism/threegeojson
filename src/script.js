@@ -22,7 +22,7 @@ const y_scale = 0.01
 const z_scale = 0.01
 
 var dataJson = {}
-loader.load("./data/out.json",function(data){
+loader.load("./data/topDummy.json",function(data){
     dataJson = JSON.parse(data)
     console.log(typeof dataJson["features"])
     //console.log(dataJson["features"][0])
