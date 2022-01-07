@@ -2,6 +2,7 @@ import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { FlyControls } from 'three/examples/jsm/controls/FlyControls.js'
+import earcut from 'earcut/src/earcut.js'
 import { FirstPersonControls } from './fp_nomouse.js'
 import * as dat from 'dat.gui'
 
@@ -19,84 +20,86 @@ const loader = new THREE.FileLoader();
 // scaler
 const x_scale = 0.01 // scale to 1/100 of original size
 const y_scale = 0.01
-const z_scale = 0.01
-
-var dataJson = {}
-loader.load("./data/topDummy.json",function(data){
-    dataJson = JSON.parse(data)
-    console.log(typeof dataJson["features"])
-    //console.log(dataJson["features"][0])
-    for(var e in dataJson["features"]){
-    //dataJson["features"].foreach(function(e){
-        console.log(dataJson["features"][e])
-        var triangleVectors = []
-        
-        var vertex = []
-        var linePoints = [new THREE.Vector3(dataJson["features"][e]["geometry"]["coordinates"][0][0]*x_scale,dataJson["features"][e]["geometry"]["coordinates"][0][1]*y_scale,dataJson["features"][e]["geometry"]["coordinates"][0][2]*z_scale)]
-        var lengthPoint = dataJson["features"][e]["geometry"]["coordinates"].length
-        for(var i=1;i<lengthPoint-1;i++){
-            vertex.push(dataJson["features"][e]["geometry"]["coordinates"][0])
-            vertex.push(dataJson["features"][e]["geometry"]["coordinates"][i])
-            vertex.push(dataJson["features"][e]["geometry"]["coordinates"][i+1])
-
-            linePoints.push(new THREE.Vector3(dataJson["features"][e]["geometry"]["coordinates"][i][0]*x_scale,dataJson["features"][e]["geometry"]["coordinates"][i][1]*y_scale,dataJson["features"][e]["geometry"]["coordinates"][i][2]*z_scale))
-        }
-        linePoints.push(new THREE.Vector3(dataJson["features"][e]["geometry"]["coordinates"][lengthPoint-1][0]*x_scale,dataJson["features"][e]["geometry"]["coordinates"][lengthPoint-1][1]*y_scale,dataJson["features"][e]["geometry"]["coordinates"][lengthPoint-1][2]*z_scale))
-        console.log(linePoints)
-        // shape.x = e["geometry"]["coordinates"][0][0]
-        // shape.y = e["geometry"]["coordinates"][0][1]
-        // shape.z = e["geometry"]["coordinates"][0][2]
-        for(var i=0;i<vertex.length;i++){
-            //shape.line(e["geometry"]["coordinates"][i][0],)
-            //triangleVectors.push([e["geometry"]["coordinates"][0],])
-            triangleVectors.push(vertex[i][0])
-            triangleVectors.push(vertex[i][1])
-            triangleVectors.push(vertex[i][2])
-        }
-        const vertices = new Float32Array(triangleVectors)
-        // var triangle = new THREE.BufferGeometry()
-        var lineMaterial = new THREE.LineBasicMaterial({color: 0xffffff,linewidth: 10});
-        
-        var triangleMaterial = new THREE.MeshStandardMaterial({color:0xff0000 ,side:THREE.DoubleSide,side: THREE.DoubleSide,flatShading: true,wireframe:false});
-
-        //var geometry = new THREE.BufferGeometry();
-        var lineGeometry = new THREE.BufferGeometry();
-        //geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-        lineGeometry.setFromPoints(linePoints)
-        //geometry.vertices.push( triangleVectors[j][0], triangleVectors[j][1], triangleVectors[j][2] );
-        //var face = new THREE.Face3(0, 1, 2);
-        //geometry.faces.push(face);
-        console.log("Add geometry")
-        const line = new THREE.Line( lineGeometry, lineMaterial );
-        //const mesh2 = new THREE.Mesh( geometry, triangleMaterial );
-        //scene.add(mesh2)
-        scene.add(line)
+const z_scale = 0.08
+function getHeightColor(height){
+    if (height<-150){
+        return 0xee82ee
+    }else if (height<-100){
+        return 0x4b0082
+    }else if (height<0){
+        return 0x0000ff
+    }else if(height<100){
+        return 0x008000
+    }else if(height<150){
+        return 0xffff00
+    }else if(height<200){
+        return 0xffa500
+    }else{
+        return 0xff0000
     }
-})
-// Objects
-//const geometry = new THREE.TorusGeometry( .7, .2, 16, 100 );
-const geometry = new THREE.SphereBufferGeometry();
+}
+var dataJson = {}
+loader.load("./data/zi.csv",function(data){
+    //return
+    var planeWidth = 43
+    var planeHeight = 73
+    // const planeWidth = 43
+    // const planeHeight = 73
+    // Objects
+    var lines = data.split("\n")
+    console.log(lines)
+    //const geometry = new THREE.TorusGeometry( .7, .2, 16, 100 );
+    const geometry = new THREE.PlaneGeometry(1,1,planeWidth-1,planeHeight-1)//SphereBufferGeometry();
+    const vertices = geometry.attributes.position.array;
+    //var colors = []
+    geometry.rotateX( - Math.PI / 2) 
+    for (let idx=0, idxH=1,k=vertices.length;idx<k;idx++,idxH+=3){
+        console.log(lines[idx])
+        if(lines[idx]==undefined){
+            continue
+        }
+        var pp = lines[idx].split(";")[2]
+        if (pp=="NaN"){
+            continue
+        }
+        // console.log(pp*z_scale)
+        vertices[idxH] = pp*z_scale
+    }
+    console.log(geometry.center())
+    //console.log(vertices)
+    //console.log(geometry.getIndex())
+    //console.log(colors)
+    //geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+    const material = new THREE.MeshPhongMaterial({
+        color: 0x156289,
+        vertexColors:false,
+        //emissive: 0x072534,
+        side: THREE.DoubleSide,
+        flatShading: true,
+        wireframe:false
+    })
+    const sphere = new THREE.Mesh(geometry,material)
+    //const sphere2 = new THREE.Mesh(geometry,material)
 
-console.log(dataJson)
+    //sphere2.translateX(10)
+    //sphere2.translateZ(2)
+    scene.add(sphere)
+
+    
+})
+
+
+
+//geometry.normalizeNormals();
 
 // Materials
 
-const material = new THREE.MeshPhongMaterial({
-    color: 0x156289,
-	emissive: 0x072534,
-	side: THREE.DoubleSide,
-	flatShading: true
-})
+
 //material.color = new THREE.Color(0xff0000)
 
 // Mesh
-const sphere = new THREE.Mesh(geometry,material)
-const sphere2 = new THREE.Mesh(geometry,material)
 
-sphere2.translateX(10)
-sphere2.translateZ(2)
-scene.add(sphere)
-scene.add(sphere2)
+//scene.add(sphere2)
 
 // Lights
 
@@ -105,6 +108,9 @@ pointLight.position.x = 2
 pointLight.position.y = 3
 pointLight.position.z = 4
 scene.add(pointLight)
+
+// const HemisphereLight = new THREE.HemisphereLight();
+// scene.add(HemisphereLight)
 
 /**
  * Sizes
@@ -135,11 +141,11 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.x =  1289*x_scale
-camera.position.y =  1127*y_scale
-camera.position.z =  -150*z_scale
+camera.position.x =  0//1289*x_scale
+camera.position.y =  0//1127*y_scale
+camera.position.z =  2//-150*z_scale
 
-camera.lookAt(1289*x_scale,1127*y_scale,-185*z_scale)
+//camera.lookAt(1289*x_scale,1127*y_scale,-185*z_scale)
 // console.log(camera.lookAt.x,camera.lookAt.y,camera.lookAt.z)
 // camera.lookAt.x = 0;
 // camera.lookAt.y = 0;
@@ -148,7 +154,7 @@ scene.add(camera)
 
 // Controls
 const controls = new FirstPersonControls(camera,canvas);
-controls.movementSpeed = 0.01
+controls.movementSpeed = 0.001
 controls.autoForward = false
 controls.lookSpeed = 0.1
 controls.mouseDragOn = false
@@ -223,7 +229,7 @@ const tick = () =>
     const elapsedTime = clock.getElapsedTime()
 
     // Update objects
-    sphere.rotation.y = .5 * elapsedTime
+    //sphere.rotation.y = .5 * elapsedTime
 
     // Update Orbital Controls
     controls.update(elapsedTime)
