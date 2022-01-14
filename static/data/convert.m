@@ -1,17 +1,27 @@
 addpath('D:\bin\jsonlab-master')
-data = loadjson("topDummy.json");
+data = loadjson("out.json");
 #disp(data.features(1).geometry.coordinates)
 x = [];
 y = [];
 z = [];
 for feature = data.features
-  #disp(feature.geometry.coordinates)
-  x_sub = feature.geometry.coordinates(:,1);
-  y_sub = feature.geometry.coordinates(:,2);
-  z_sub = feature.geometry.coordinates(:,3);
-  x = [x,x_sub'];
-  y = [y,y_sub'];
-  z = [z,z_sub'];
+  disp(feature.geometry.coordinates);
+  if size(feature.geometry.coordinates)(2)==3
+    x_sub = feature.geometry.coordinates(:,1);
+    y_sub = feature.geometry.coordinates(:,2);
+    z_sub = feature.geometry.coordinates(:,3);
+    x = [x,x_sub'];
+    y = [y,y_sub'];
+    z = [z,z_sub'];
+  elseif size(feature.geometry.coordinates)(2)==2
+    x_sub = feature.geometry.coordinates(:,1);
+    y_sub = feature.geometry.coordinates(:,2);
+    z_sub = zeros(size(feature.geometry.coordinates)(1),1);
+    x = [x,x_sub'];
+    y = [y,y_sub'];
+    z = [z,z_sub'];
+  endif
+  
 endfor
 printf("X = %f %f\n",min(x),max(x))
 printf("Y = %f %f\n",min(y),max(y))

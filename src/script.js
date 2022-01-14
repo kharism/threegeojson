@@ -20,7 +20,7 @@ const loader = new THREE.FileLoader();
 // scaler
 const x_scale = 0.01 // scale to 1/100 of original size
 const y_scale = 0.01
-const z_scale = 0.08
+const z_scale = 0.05
 function getHeightColor(height){
     if (height<-150){
         return 0xee82ee
@@ -41,15 +41,15 @@ function getHeightColor(height){
 var dataJson = {}
 loader.load("./data/zi.csv",function(data){
     //return
-    var planeWidth = 43
-    var planeHeight = 73
+    var planeWidth = 531
+    var planeHeight = 330
     // const planeWidth = 43
     // const planeHeight = 73
     // Objects
     var lines = data.split("\n")
     console.log(lines)
     //const geometry = new THREE.TorusGeometry( .7, .2, 16, 100 );
-    const geometry = new THREE.PlaneGeometry(1,1,planeWidth-1,planeHeight-1)//SphereBufferGeometry();
+    const geometry = new THREE.PlaneGeometry(planeWidth/10,planeHeight/10,planeWidth-1,planeHeight-1)//SphereBufferGeometry();
     const vertices = geometry.attributes.position.array;
     //var colors = []
     geometry.rotateX( - Math.PI / 2) 
@@ -103,10 +103,10 @@ loader.load("./data/zi.csv",function(data){
 
 // Lights
 
-const pointLight = new THREE.PointLight(0xffffff, 0.8)
-pointLight.position.x = 2
-pointLight.position.y = 3
-pointLight.position.z = 4
+const pointLight = new THREE.DirectionalLight(0xffffff, 1.0)//new THREE.PointLight(0xffffff, 1.0)
+// pointLight.position.x = 2
+// pointLight.position.y = 3
+// pointLight.position.z = 4
 scene.add(pointLight)
 
 // const HemisphereLight = new THREE.HemisphereLight();
@@ -154,7 +154,7 @@ scene.add(camera)
 
 // Controls
 const controls = new FirstPersonControls(camera,canvas);
-controls.movementSpeed = 0.001
+controls.movementSpeed = 0.01
 controls.autoForward = false
 controls.lookSpeed = 0.1
 controls.mouseDragOn = false
