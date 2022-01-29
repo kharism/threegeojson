@@ -5,7 +5,6 @@ x = [];
 y = [];
 z = [];
 for feature = data.features
-  disp(feature.geometry.coordinates);
   if size(feature.geometry.coordinates)(2)==3
     x_sub = feature.geometry.coordinates(:,1);
     y_sub = feature.geometry.coordinates(:,2);
@@ -26,8 +25,8 @@ endfor
 printf("X = %f %f\n",min(x),max(x))
 printf("Y = %f %f\n",min(y),max(y))
 printf("Z = %f %f\n",min(z),max(z))
-x_range = [min(x):10:max(x)];
-y_range = [min(y):10:max(y)];
+x_range = [min(x):5:max(x)];
+y_range = [min(y):5:max(y)];
 ori_x_range = size(x_range)(2);
 ori_y_range = size(y_range)(2);
 xi = repmat(x_range,[1,size(y_range)(2)]);
@@ -48,5 +47,5 @@ size(zi)
 #size(z)
 caxis("auto")
 printf("%d %d\n",ori_x_range,ori_y_range)
-dlmwrite("zi.csv",[xi',yi',zi],';')
+dlmwrite("zi2.csv",[xi',yi',zi],';')
 #mesh(xi,yi,zi);

@@ -5,6 +5,7 @@ import { FlyControls } from 'three/examples/jsm/controls/FlyControls.js'
 import earcut from 'earcut/src/earcut.js'
 import { FirstPersonControls } from './fp_nomouse.js'
 import * as dat from 'dat.gui'
+import interact from 'interactjs'
 
 // Debug
 const gui = new dat.GUI()
@@ -39,15 +40,33 @@ function getHeightColor(height){
     }
 }
 var dataJson = {}
-loader.load("./data/zi.csv",function(data){
+loader.load("./data/zi2.csv",function(data){
     //return
-    var planeWidth = 531
-    var planeHeight = 330
+    /*
+     *  X = -1891.675555 3417.558576
+     *  Y = -386.917141 2911.797642
+     *  Z = -185.000000 194.000000
+     *  Size xi 700920
+     *   Size yi 700920
+     *   ans =
+     *           1   700920
+     *   ans =
+     *           1   700920
+     *   ans =
+     *      700920        1
+     *   1062 660
+     * 
+     *
+     */
+
+    var planeWidth = 531*2
+    var planeHeight = 330*2
     // const planeWidth = 43
     // const planeHeight = 73
     // Objects
+    const texture = new THREE.TextureLoader().load( "data/jj.jpg" );
     var lines = data.split("\n")
-    console.log(lines)
+    //console.log(lines)
     //const geometry = new THREE.TorusGeometry( .7, .2, 16, 100 );
     const geometry = new THREE.PlaneGeometry(planeWidth/10,planeHeight/10,planeWidth-1,planeHeight-1)//SphereBufferGeometry();
     const vertices = geometry.attributes.position.array;
@@ -65,31 +84,43 @@ loader.load("./data/zi.csv",function(data){
         // console.log(pp*z_scale)
         vertices[idxH] = pp*z_scale
     }
-    console.log(geometry.center())
+    
+    //console.log(geometry.center())
     //console.log(vertices)
     //console.log(geometry.getIndex())
     //console.log(colors)
     //geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
-    const material = new THREE.MeshPhongMaterial({
-        color: 0x156289,
-        vertexColors:false,
+    const material = new THREE.MeshStandardMaterial({
+        //color: 0x156289,
+        //vertexColors:false,
         //emissive: 0x072534,
         side: THREE.DoubleSide,
         flatShading: true,
         wireframe:false
     })
+    material.map = texture
     const sphere = new THREE.Mesh(geometry,material)
+    //terlaly berat. Di-komen dulu
+    //geometry.computeBoundingBox()
+    //geometry.computeVertexNormals()
     //const sphere2 = new THREE.Mesh(geometry,material)
 
     //sphere2.translateX(10)
     //sphere2.translateZ(2)
     scene.add(sphere)
-
-    
+    //scene.rotateX(Math.PI / 2)
+    console.log("Done Loading")
 })
 
-
-
+// const geometry = new THREE.PlaneGeometry(1,1,2,2)
+// const texture = new THREE.TextureLoader().load( "data/ssb.jpg" );
+// const material = new THREE.MeshPhongMaterial({
+//     color:0x156289,
+//     wireframe:false,
+//     map:texture
+// })
+// const plane = new THREE.Mesh(geometry,material)
+// scene.add(plane)
 //geometry.normalizeNormals();
 
 // Materials
@@ -232,7 +263,7 @@ const tick = () =>
     //sphere.rotation.y = .5 * elapsedTime
 
     // Update Orbital Controls
-    controls.update(elapsedTime)
+    // controls.update(elapsedTime)
 
     // Render
     renderer.render(scene, camera)
@@ -242,3 +273,25 @@ const tick = () =>
 }
 
 tick()
+const position = { x: 0, y: 0 }
+interact('.draggable').draggable({
+    listeners: {
+        start (event) {
+            console.log("Start Dragging")
+          },
+        move (event) {
+            position.x += event.dx
+            position.y += event.dy
+      
+            event.target.style.transform =
+              `translate(${position.x}px, ${position.y}px)`
+          },
+    },
+    
+    modifiers: [
+        interact.modifiers.restrictRect({
+          restriction: 'parent',
+          endOnly: true
+        })
+      ],
+  })
